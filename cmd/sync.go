@@ -22,8 +22,6 @@ THE SOFTWARE.
 package cmd
 
 import (
-	"log"
-
 	"github.com/mitch292/janitor/internal/files"
 	"github.com/mitch292/janitor/internal/util"
 
@@ -51,17 +49,15 @@ func init() {
 
 func cmdRun(cmd *cobra.Command, args []string) {
 	configFiles := viper.GetStringMap("files")
+	internalFileDir := files.NewInternalFileDirectory()
+
 	for name := range configFiles {
 		source := viper.GetString(util.GetNestedConfigValueAccessor("files", name, "source"))
 		destination := viper.GetString(util.GetNestedConfigValueAccessor("files", name, "destination"))
+		janitorFile := files.NewJanitorFile(name, source, destination)
 
-		internalFileDir := files.CreateInternalFileDirectory()
-
-		if err := internalFileDir.Sync(name, source, destination); err != nil {
-			if err := internalFileDir.WriteError(err.Error()); err != nil {
-				log.Fatal("There was a problem writing to the error log.")
-			}
-			return
+		if err := internalFileDir.Sync(janitorFile); err != nil {
+			internalFileDir.WriteErrorToLog(err.Error())
 		}
 	}
 }
