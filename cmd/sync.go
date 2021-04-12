@@ -22,6 +22,8 @@ THE SOFTWARE.
 package cmd
 
 import (
+	"log"
+
 	"github.com/mitch292/janitor/internal/files"
 	"github.com/mitch292/janitor/internal/util"
 
@@ -56,7 +58,9 @@ func cmdRun(cmd *cobra.Command, args []string) {
 		internalFileDir := files.CreateInternalFileDirectory()
 
 		if err := internalFileDir.Sync(name, source, destination); err != nil {
-			internalFileDir.WriteError(err.Error())
+			if err := internalFileDir.WriteError(err.Error()); err != nil {
+				log.Fatal("There was a problem writing to the error log.")
+			}
 			return
 		}
 	}

@@ -3,6 +3,7 @@ package files
 import (
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"path"
@@ -41,16 +42,7 @@ func CreateInternalFileDirectory() *InternalFileDirectory {
 		os.Exit(1)
 	}
 
-	// instantiate our error log
 	f.errorLogLocation = INTERNAL_ERROR_LOG_FILE
-	if !util.FileExists(f.errorLogLocation) {
-		out, err := os.Create(path.Join(f.location, f.errorLogLocation))
-		if err != nil {
-			fmt.Print(err)
-			os.Exit(1)
-		}
-		defer out.Close()
-	}
 
 	return f
 }
@@ -89,6 +81,16 @@ func (fileDir *InternalFileDirectory) Sync(name, source, destination string) (er
 	return
 }
 
-func (fileDir *InternalFileDirectory) WriteError(message string) {
+func (fileDir *InternalFileDirectory) WriteError(message string) error {
+	// If the file doesn't exist, create it, or append to the file
+	errorLogFile, err := os.OpenFile(path.Join(fileDir.location, fileDir.errorLogLocation), os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		return err
+	}
+	defer errorLogFile.Close()
 
+	logger := log.New(errorLogFile, "janitor: ", log.LstdFlags)
+	logger.Println(message)
+
+	return nil
 }
