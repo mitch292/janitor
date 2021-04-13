@@ -24,8 +24,7 @@ func NewJanitorFile(name, sourceLocation, destinationLocation string) *janitorFi
 	}
 }
 
-// GetFileDataFromSource will pull the file data from a remote source keep bytes in memory.
-func (f *janitorFile) GetFileDataFromSource() (err error) {
+func (f *janitorFile) getFileDataFromSource() (err error) {
 	resp, err := http.Get(f.sourceLocation)
 	if err != nil {
 		return
@@ -38,9 +37,7 @@ func (f *janitorFile) GetFileDataFromSource() (err error) {
 	return
 }
 
-// WriteFileDataToDestination will write the files contents to the
-// specified destination for the file.
-func (f *janitorFile) WriteFileDataToDestination() (err error) {
+func (f *janitorFile) writeFileDataToDestination() (err error) {
 	out, err := os.Create(f.destinationLocation)
 	if err != nil {
 		return
@@ -58,7 +55,6 @@ func (f *janitorFile) WriteFileDataToDestination() (err error) {
 	return
 }
 
-// CreateSymlinkToDir will create a symlink from this file to a given directory.
-func (f *janitorFile) CreateSymlinkToDir(directory *internalFileDirectory) {
+func (f *janitorFile) createSymlinkToDir(directory *internalFileDirectory) {
 	os.Symlink(f.destinationLocation, path.Join(directory.location, f.name))
 }

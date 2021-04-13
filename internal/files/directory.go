@@ -43,15 +43,15 @@ func NewInternalFileDirectory() *internalFileDirectory {
 
 // Sync will take a file from the source and add it to the destination
 func (f *internalFileDirectory) Sync(janitorFile *janitorFile) (err error) {
-	if err = janitorFile.GetFileDataFromSource(); err != nil {
+	if err = janitorFile.getFileDataFromSource(); err != nil {
 		return
 	}
 
-	if err = janitorFile.WriteFileDataToDestination(); err != nil {
+	if err = janitorFile.writeFileDataToDestination(); err != nil {
 		return
 	}
 
-	janitorFile.CreateSymlinkToDir(f)
+	janitorFile.createSymlinkToDir(f)
 
 	return
 }
