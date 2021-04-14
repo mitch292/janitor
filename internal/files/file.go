@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"os"
 	"path"
+
+	"github.com/mitch292/janitor/internal/util"
 )
 
 type janitorFile struct {
@@ -14,14 +16,19 @@ type janitorFile struct {
 	contents            []byte
 }
 
-// NewJanitorFile will create a new janitorFile struct.
-func NewJanitorFile(name, sourceLocation, destinationLocation string) *janitorFile {
+// NewJanitorFile will create a new janitorFile struct. This will hep us  interact
+// with the source file and destination
+func NewJanitorFile(name, sourceLocation, destinationLocation string) (*janitorFile, error) {
+	destination, err := util.AbsolutePath(destinationLocation)
+	if err != nil {
+		return &janitorFile{}, err
+	}
 	return &janitorFile{
 		name:                name,
 		sourceLocation:      sourceLocation,
-		destinationLocation: destinationLocation,
+		destinationLocation: destination,
 		contents:            make([]byte, 0),
-	}
+	}, nil
 }
 
 func (f *janitorFile) getFileDataFromSource() (err error) {

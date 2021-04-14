@@ -29,8 +29,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-var fileName string
-
 // syncCmd represents the sync command
 var syncCmd = &cobra.Command{
 	Use:   "sync",
@@ -43,21 +41,22 @@ and place them in the destination.`,
 
 func init() {
 	rootCmd.AddCommand(syncCmd)
-
-	syncCmd.Flags().StringVarP(&fileName, "file-name", "f", "", "The name of a specific file to sync.")
 }
 
 func cmdRun(cmd *cobra.Command, args []string) {
 	configFiles := viper.GetStringMap("files")
 	internalFileDir := files.NewInternalFileDirectory()
+	errorLog := files.NewErrorLog()
 
 	for name := range configFiles {
 		source := viper.GetString(util.GetNestedConfigValueAccessor("files", name, "source"))
 		destination := viper.GetString(util.GetNestedConfigValueAccessor("files", name, "destination"))
-		janitorFile := files.NewJanitorFile(name, source, destination)
-
+		janitorFile, err := files.NewJanitorFile(name, source, destination)
+		if err != nil {
+			errorLog.WriteErrorToLog(err.Error())
+		}
 		if err := internalFileDir.Sync(janitorFile); err != nil {
-			internalFileDir.WriteErrorToLog(err.Error())
+			errorLog.WriteErrorToLog(err.Error())
 		}
 	}
 }
