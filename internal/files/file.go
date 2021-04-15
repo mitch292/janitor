@@ -13,20 +13,23 @@ type janitorFile struct {
 	sourceLocation      string
 	destinationLocation string
 	name                string
+	isSafeMode          bool
 	contents            []byte
 }
 
 // NewJanitorFile will create a new janitorFile struct. This will hep us  interact
 // with the source file and destination
-func NewJanitorFile(name, sourceLocation, destinationLocation string) (*janitorFile, error) {
+func NewJanitorFile(name, sourceLocation, destinationLocation string, isSafeMode bool) (*janitorFile, error) {
 	destination, err := util.AbsolutePath(destinationLocation)
 	if err != nil {
 		return &janitorFile{}, err
 	}
+
 	return &janitorFile{
 		name:                name,
 		sourceLocation:      sourceLocation,
 		destinationLocation: destination,
+		isSafeMode:          isSafeMode,
 		contents:            make([]byte, 0),
 	}, nil
 }
@@ -45,6 +48,10 @@ func (f *janitorFile) getFileDataFromSource() (err error) {
 }
 
 func (f *janitorFile) writeFileDataToDestination() (err error) {
+	if util.FileExists(f.destinationLocation) {
+		return
+	}
+
 	out, err := os.Create(f.destinationLocation)
 	if err != nil {
 		return

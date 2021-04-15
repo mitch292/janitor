@@ -51,7 +51,8 @@ func cmdRun(cmd *cobra.Command, args []string) {
 	for name := range configFiles {
 		source := viper.GetString(util.GetNestedConfigValueAccessor("files", name, "source"))
 		destination := viper.GetString(util.GetNestedConfigValueAccessor("files", name, "destination"))
-		janitorFile, err := files.NewJanitorFile(name, source, destination)
+		isSafeMode := viper.GetBool(util.GetNestedConfigValueAccessor("files", name, "safeMode"))
+		janitorFile, err := files.NewJanitorFile(name, source, destination, isSafeMode)
 		if err != nil {
 			errorLog.WriteErrorToLog(err.Error())
 		}
