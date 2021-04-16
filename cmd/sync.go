@@ -36,14 +36,14 @@ var syncCmd = &cobra.Command{
 	Long: `Sync this environment with the remote file or directory.
 It will look at your .janitor.yaml file and take all source directories or files
 and place them in the destination.`,
-	Run: cmdRun,
+	Run: syncCmdRun,
 }
 
 func init() {
 	rootCmd.AddCommand(syncCmd)
 }
 
-func cmdRun(cmd *cobra.Command, args []string) {
+func syncCmdRun(cmd *cobra.Command, args []string) {
 	configFiles := viper.GetStringMap("files")
 	internalFileDir := files.NewInternalFileDirectory()
 	errorLog := files.NewErrorLog()

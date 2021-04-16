@@ -2,12 +2,14 @@ package files
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path"
 
 	homedir "github.com/mitchellh/go-homedir"
 
 	"github.com/mitch292/janitor/internal/constants"
+	"github.com/mitch292/janitor/internal/util"
 )
 
 // The InternalFileDirect or the "Janitor's closet" is where all the files will go.
@@ -49,5 +51,22 @@ func (f *internalFileDirectory) Sync(janitorFile *janitorFile) (err error) {
 
 	janitorFile.createSymlinkToDir(f)
 
+	return
+}
+
+// Mop will remove broken symlinks from the internalFileDirectory
+func (f *internalFileDirectory) Mop() (err error) {
+	files, err := ioutil.ReadDir(f.location)
+	if err != nil {
+		return
+	}
+
+	for _, file := range files {
+		symLinkPath := path.Join(f.location, file.Name())
+
+		if err := util.RemoveSymlinkIfBroken(symLinkPath); err != nil {
+			return err
+		}
+	}
 	return
 }

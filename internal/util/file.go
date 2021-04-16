@@ -43,3 +43,18 @@ func AbsolutePath(filename string) (string, error) {
 	}
 	return filename, nil
 }
+
+// RemoveSymlinkIfBroken takes a symlink path and will remove the symlink
+// if the source file does not exist
+func RemoveSymlinkIfBroken(symLinkPath string) (err error) {
+	fullPath, err := os.Readlink(symLinkPath)
+	if err != nil {
+		return err
+	}
+
+	if !FileExists(fullPath) {
+		os.Remove(symLinkPath)
+	}
+
+	return
+}
