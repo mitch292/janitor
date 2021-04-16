@@ -70,3 +70,18 @@ func (f *internalFileDirectory) Mop() (err error) {
 	}
 	return
 }
+
+// Trash will remove all files managed by janitor.
+func (f *internalFileDirectory) Trash() (err error) {
+	files, err := ioutil.ReadDir(f.location)
+	if err != nil {
+		return
+	}
+
+	for _, file := range files {
+		symLinkPath := path.Join(f.location, file.Name())
+
+		util.RemoveSymlinkAndSourceFile(symLinkPath)
+	}
+	return
+}
