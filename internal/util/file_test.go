@@ -148,3 +148,28 @@ func TestRemoveSymlinkIfBrokenWithValidSymlink(t *testing.T) {
 		t.Fatalf("RemoveSylinkIfBroken removed a symlink (%s) when the source file (%s) still existed.", symlinkPath, tmpFile.Name())
 	}
 }
+
+func TestRemoveSymlinkAndSourceFile(t *testing.T) {
+	tmpFile, err := ioutil.TempFile("", "testfile")
+	if err != nil {
+		t.Fatal("Could not create a temporary testing file.")
+	}
+
+	cwd, err := os.Getwd()
+	if err != nil {
+		t.Fatal("Could not get the cwd while preparing test.")
+	}
+
+	symlinkPath := path.Join(cwd, "link")
+	os.Symlink(tmpFile.Name(), symlinkPath)
+
+	RemoveSymlinkAndSourceFile(symlinkPath)
+
+	if FileExists(symlinkPath) {
+		t.Fatalf("RemoveSymlinkAndSourceFile failed to remove the symlink %s", symlinkPath)
+	}
+
+	if FileExists(tmpFile.Name()) {
+		t.Fatalf("RemoveSymlinkAndSourceFile failed to remove the file %s", tmpFile.Name())
+	}
+}
