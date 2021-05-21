@@ -48,7 +48,7 @@ func (f *janitorFile) getFileDataFromSource() (err error) {
 }
 
 func (f *janitorFile) writeFileDataToDestination() (err error) {
-	if util.FileExists(f.destinationLocation) {
+	if util.FileExists(f.destinationLocation) && f.isSafeMode {
 		return
 	}
 
